@@ -14,6 +14,11 @@ describe Computer do
 		expect(computer.marker).to eq 'O'
 	end
 
+	it 'for his first go will go for the middle tile if not taken' do 
+		computer.make_decision_on board
+		expect(board.grid[1][1]).to eq "O"
+	end
+
 	it 'will go for tiles in a row if not threatened' do 
 		computer.target board, 1, 1
 		computer.make_decision_on board
@@ -35,7 +40,6 @@ describe Computer do
 	end
 
 
-
 	it 'if threatened, but is his go, will go for the killer' do 
 		computer.target board, 1, 1
 		computer.target board, 1, 2
@@ -43,8 +47,6 @@ describe Computer do
 		expect(board.grid[0][2]).to eq "O"
 	end
 
-	it 'should decide between blocking an opponent and pursuing an advantage' do 
 
-	end
 
 end

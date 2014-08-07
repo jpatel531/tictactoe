@@ -3,13 +3,29 @@ require_relative 'board'
 
 class Computer < Player
 
+
 	def initialize
 		@marker = "O"
 	end
 
 	def make_decision_on board
-		killer_shot_on board if threatening_on? board
-		(threatened_on? board) ? (block_opponent_on board) : (attack board)
+		if first_go_on? board
+			initial_move_on board
+		elsif threatening_on? board
+			killer_shot_on board
+		elsif threatened_on? board
+			block_opponent_on board
+		else
+			attack board
+		end
+	end
+
+	def first_go_on? board
+		board.grid.none? {|row| row.include? "O"}
+	end
+
+	def initial_move_on board
+		(free_to_place? board, 2, 2) ? (target board, 2, 2) : (target board, 1, 3)
 	end
 
 	def attack board
@@ -31,17 +47,22 @@ class Computer < Player
 	end
 
 	def threatened_on? board
-		threats_on board, "X"
+		board.winning_combinations.any? do |name, coordinate_set|
+			coordinate_set.map {|coordinate| board.grid[coordinate[0]][coordinate[1]]}.permutation.to_a.include? ["X", "X", ""]
+		end
 	end
 
 	def threatening_on? board
-		threats_on board, "O"
+		puts board
+		board.winning_combinations.any? do |name, coordinate_set|
+			coordinate_set.map {|coordinate| board.grid[coordinate[0]][coordinate[1]]}.permutation.to_a.include? ["O", "O", ""]
+		end
 	end
 
-	def threats_on board, neighbouring_mark
-		board.winning_combinations.any? do |name, coordinate_set|
-			coordinate_set.map {|coordinate| board.grid[coordinate[0]][coordinate[1]]}.permutation.to_a.include? [neighbouring_mark, neighbouring_mark, ""]
-		end
+	def threats_on? board, neighbouring_mark
+		# board.winning_combinations.any? do |name, coordinate_set|
+		# 	coordinate_set.map {|coordinate| board.grid[coordinate[0]][coordinate[1]]}.permutation.to_a.include? [neighbouring_mark, neighbouring_mark, ""]
+		# end
 	end
 
 
