@@ -7,26 +7,52 @@ class Computer < Player
 		@marker = "O"
 	end
 
-	def block_opponent_on board
-		board.winning_combinations.each do |name, coordinate_set|
-		# 	if (coordinates.count {|coordinate| board.grid[coordinate[0]][coordinate[1]] == "X"} == 2) && (line.include? "")
-		# 		remaining_coordinate = coordinates.index("")
-		# 		remaining_coordinate = "O"
-		# 	end
-		# end
+	def make_decision_on board
+		killer_shot_on board if threatening_on? board
+		(threatened_on? board) ? (block_opponent_on board) : (attack board)
+	end
 
-			# coordinate_set.each do |coordinates|
-			# 	if (coordinates.count {|coordinate| board.grid[coordinate[0]][coordinate[1]] == "X"} == 2) && 
-			if (coordinate_set.count {|coordinate| board.grid[coordinate[0]][coordinate[1]] == "X"} == 2) && coordinate_set.count {|coordinate| board.grid[coordinate[0]][coordinate[1]] == ""} == 1
-				remaining_coordinate = coordinate_set.select {|coordinate| board.grid[coordinate[0]][coordinate[1]] == ""}
-				# puts remaining_coordinate.flatten.inspect
-				puts remaining_coordinate.flatten[1]
-				target board, (remaining_coordinate.flatten[0] + 1), (remaining_coordinate.flatten[1] + 1)
+	def attack board
+		board.winning_combinations.find do |name, coordinate_set|
+			potential_row = coordinate_set.map {|coordinate| board.grid[coordinate[0]][coordinate[1]]}
+			if (!potential_row.include? 'X') && (potential_row.include? 'O')
+				this_spot = coordinate_set.select {|coordinate| board.grid[coordinate[0]][coordinate[1]] == ""}.shuffle.flatten
+				target board, this_spot[0] + 1, this_spot[1] + 1
 			end
 		end
 	end
 
+	def killer_shot_on board
+		fill_remaining_spot_on board, "O"
+	end
 
+	def block_opponent_on board
+		fill_remaining_spot_on board, "X"
+	end
+
+	def threatened_on? board
+		threats_on board, "X"
+	end
+
+	def threatening_on? board
+		threats_on board, "O"
+	end
+
+	def threats_on board, neighbouring_mark
+		board.winning_combinations.any? do |name, coordinate_set|
+			coordinate_set.map {|coordinate| board.grid[coordinate[0]][coordinate[1]]}.permutation.to_a.include? [neighbouring_mark, neighbouring_mark, ""]
+		end
+	end
+
+
+	def fill_remaining_spot_on board, neighbouring_mark
+		board.winning_combinations.each do |name, coordinate_set|
+			if coordinate_set.map {|coordinate| board.grid[coordinate[0]][coordinate[1]]}.permutation.to_a.include? [neighbouring_mark, neighbouring_mark, ""]
+				remaining_coordinate = coordinate_set.find {|coordinate| board.grid[coordinate[0]][coordinate[1]] == ""}.flatten
+				target board, (remaining_coordinate[0] + 1), (remaining_coordinate[1] + 1)
+			end
+		end
+	end
 
 
 

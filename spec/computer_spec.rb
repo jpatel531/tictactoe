@@ -14,6 +14,11 @@ describe Computer do
 		expect(computer.marker).to eq 'O'
 	end
 
+	it 'will go for tiles in a row if not threatened' do 
+		computer.target board, 1, 1
+		computer.make_decision_on board
+	end
+
 	it 'will block off an opponent who has an advantage' do
 		player.target board, 1,1
 		player.target board, 1,2
@@ -21,14 +26,21 @@ describe Computer do
 		expect(board.grid[0][2]).to eq "O"
 	end
 
-	it 'if not threatened, will go for consecutive tiles' do 
-
+	it 'will block them off even if the tiles are not consecutive' do 
+		player.target board, 1,1
+		player.target board, 1,3
+		computer.block_opponent_on board
+		expect(board.grid[0][1]).to eq "O"
 
 	end
 
+
+
 	it 'if threatened, but is his go, will go for the killer' do 
-
-
+		computer.target board, 1, 1
+		computer.target board, 1, 2
+		computer.make_decision_on board
+		expect(board.grid[0][2]).to eq "O"
 	end
 
 	it 'should decide between blocking an opponent and pursuing an advantage' do 
