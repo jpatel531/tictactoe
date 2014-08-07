@@ -14,7 +14,7 @@ module MoveValidator
 	end
 
 	def free_to_place? board, row, column
-		if !board.grid[row - 1][column - 1].nil?
+		if board.grid[row - 1][column - 1] != ""
 			puts 'Already hit bro'
 			false
 		else
