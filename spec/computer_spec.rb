@@ -26,15 +26,17 @@ describe Computer do
 
 	it 'will block off an opponent who has an advantage' do
 		player.target board, 1,1
+		computer.target board, 3, 3
 		player.target board, 1,2
-		computer.block_opponent_on board
+		computer.make_decision_on board
 		expect(board.grid[0][2]).to eq "O"
 	end
 
 	it 'will block them off even if the tiles are not consecutive' do 
 		player.target board, 1,1
+		computer.target board, 3, 3
 		player.target board, 1,3
-		computer.block_opponent_on board
+		computer.make_decision_on board
 		expect(board.grid[0][1]).to eq "O"
 
 	end
@@ -47,6 +49,12 @@ describe Computer do
 		expect(board.grid[0][2]).to eq "O"
 	end
 
+	it 'if not threatened nor threatening nor first go, will throw a wildcard' do 
+		board.grid = [["X", "X", "O"], ["O", "O", "X"], ["X", "", ""]]
+		computer.make_decision_on board
+		# puts board.grid[2]
+		expect(board.grid[2]).to include "O"
+	end
 
 
 end

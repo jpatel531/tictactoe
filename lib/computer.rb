@@ -15,14 +15,34 @@ class Computer < Player
 			killer_shot_on board
 		elsif threatened_on? board
 			block_opponent_on board
-		else
+		elsif has_one_in_a_line_on? board
 			attack board
+		else
+			throw_wildcard_on board
+			# attack board
 		end
 	end
 
 	def first_go_on? board
 		board.grid.none? {|row| row.include? "O"}
 	end
+
+	def has_one_in_a_line_on? board
+		board.winning_combinations.find do |name, coordinate_set|
+			potential_row = coordinate_set.map {|coordinate| board.grid[coordinate[0]][coordinate[1]]}
+			if (!potential_row.include? 'X') && (potential_row.include? 'O')
+				return true
+			end
+		end
+		false
+	end
+
+	def throw_wildcard_on board
+		potential_row = board.grid.find { |row| row.include? "" }
+		coordinates = [board.grid.index(potential_row), potential_row.index("")]
+		target board, coordinates[0] + 1, coordinates[1] + 1
+	end	
+
 
 	def initial_move_on board
 		(free_to_place? board, 2, 2) ? (target board, 2, 2) : (target board, 1, 3)
@@ -47,22 +67,17 @@ class Computer < Player
 	end
 
 	def threatened_on? board
-		board.winning_combinations.any? do |name, coordinate_set|
-			coordinate_set.map {|coordinate| board.grid[coordinate[0]][coordinate[1]]}.permutation.to_a.include? ["X", "X", ""]
-		end
+		threats_on? board, "X"
 	end
 
 	def threatening_on? board
-		puts board
-		board.winning_combinations.any? do |name, coordinate_set|
-			coordinate_set.map {|coordinate| board.grid[coordinate[0]][coordinate[1]]}.permutation.to_a.include? ["O", "O", ""]
-		end
+		threats_on? board, "O"
 	end
 
 	def threats_on? board, neighbouring_mark
-		# board.winning_combinations.any? do |name, coordinate_set|
-		# 	coordinate_set.map {|coordinate| board.grid[coordinate[0]][coordinate[1]]}.permutation.to_a.include? [neighbouring_mark, neighbouring_mark, ""]
-		# end
+		board.winning_combinations.any? do |name, coordinate_set|
+			coordinate_set.map {|coordinate| board.grid[coordinate[0]][coordinate[1]]}.permutation.to_a.include? [neighbouring_mark, neighbouring_mark, ""]
+		end
 	end
 
 

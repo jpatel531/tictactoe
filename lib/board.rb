@@ -21,9 +21,6 @@ class Board
 	end
 
 
+
 end
 
-
-# diagonal if row + col minus to 0 or add up to 2
-# in a row if they have the same row coord
-# in a column if same col coord

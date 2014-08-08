@@ -11,7 +11,7 @@ class Player
 	end
 
 	def target board, row, column
-		board.grid[row - 1][column - 1] = marker if	valid_move? board, row, column
+		board.grid[row - 1][column - 1] = marker if valid_move? board, row, column
 	end
 
 end
