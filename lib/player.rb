@@ -1,8 +1,8 @@
-require_relative 'move_validator'
+require_relative 'rules'
 
 class Player
 
-	include MoveValidator
+	include Rules
 
 	attr_reader :marker
 	attr_accessor :board

@@ -1,4 +1,4 @@
-module MoveValidator
+module Rules
 
 	def valid_move? row, column
 		within_bounds?(row, column) && free_to_place?(row, column)

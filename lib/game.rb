@@ -1,12 +1,14 @@
 require_relative 'computer'
-require_relative 'move_validator'
+require_relative 'rules'
+require_relative 'grid_helpers'
 
 class Game
 
 	attr_reader :human, :computer, :board
 	attr_accessor :turn
 
-	include MoveValidator
+	include Rules
+	include GridHelpers
 
 	def initialize
 		@human = Player.new
@@ -39,7 +41,7 @@ class Game
 
 	def winner
 		board.winning_combinations.each do |name, coordinate_set|
-			line = coordinate_set.map {|coordinate| board.grid[coordinate[0]][coordinate[1]]}
+			line = coordinate_set.map(&coordinate_values)
 			if (line == ["X", "X", "X"]) || (line == ["O", "O", "O"])
 				return (line.first == "X") ? human : computer	
 			end

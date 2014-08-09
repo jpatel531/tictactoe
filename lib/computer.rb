@@ -1,7 +1,10 @@
 require_relative 'player'
 require_relative 'board'
+require_relative 'grid_helpers'
 
 class Computer < Player
+
+	include GridHelpers
 
 	attr_accessor :board
 
@@ -9,16 +12,8 @@ class Computer < Player
 		@marker = "O"
 	end
 
-	def coordinate_values
-		Proc.new {|coordinate| board.grid[coordinate[0]][coordinate[1]]}
-	end
-
-	def blank_cell
-		Proc.new {|coordinate| board.grid[coordinate[0]][coordinate[1]] == ""}
-	end
-
 	def make_decision
-		(first_go?) ? (initial_move) : ((threatening?) ? (killer_shot) : ((threatened?) ? (block_opponent) : ((has_one_in_a_line?) ? advance : (throw_wildcard))))
+		first_go? ? initial_move : threatening? ? killer_shot : threatened? ? block_opponent : has_one_in_a_line? ? advance : throw_wildcard
 	end
 
 
@@ -64,22 +59,13 @@ class Computer < Player
 	end
 
 	def threatened?
-		threats_on? "X"
+		threats_with? "X"
 	end
 
 	def threatening?
-		threats_on? "O"
+		threats_with? "O"
 	end
 
-	def threats_on? neighbouring_mark
-		board.winning_combinations.any? do |name, coordinate_set|
-			contains_two_in_a_line_and_one_blank coordinate_set, neighbouring_mark
-		end
-	end
-
-	def contains_two_in_a_line_and_one_blank coordinate_set, neighbouring_mark
-		coordinate_set.map(&coordinate_values).permutation.to_a.include? [neighbouring_mark, neighbouring_mark, ""]
-	end
 
 	def fill_remaining_spot neighbouring_mark
 		board.winning_combinations.each do |name, coordinate_set|
