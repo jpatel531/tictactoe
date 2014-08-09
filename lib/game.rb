@@ -1,9 +1,12 @@
 require_relative 'computer'
+require_relative 'move_validator'
 
 class Game
 
 	attr_reader :human, :computer, :board
 	attr_accessor :turn
+
+	include MoveValidator
 
 	def initialize
 		@human = Player.new
@@ -24,17 +27,12 @@ class Game
 		(turn == human) ? (get_input) : (computer.make_decision_on board)
 	end
 
-	def invalid? string
-		(/^\d, \d$/ =~ string).nil?
-	end
-
 	def get_input 
 		puts "Enter where you wish to place your tile by row and column number, e.g. '1, 1'. Type 'exit' to exit "
 		input = STDIN.gets.chomp
-		exit if input == "exit"
-		get_input if invalid? input
+		check input
 		coordinates = input.split(", ").map(&:to_i)
-		human.valid_move?(board, coordinates[0], coordinates[1]) ? human.target(board, coordinates[0], coordinates[1]) : get_input
+		valid_move?(board, coordinates[0], coordinates[1]) ? human.target(board, coordinates[0], coordinates[1]) : get_input
 	end
 
 	def winner
@@ -63,21 +61,25 @@ class Game
 	def play_again?
 		puts "Do you wish to play again? 'y' for restart and 'n' for exit"
 		wish = STDIN.gets.chomp
-		if wish == 'y'
-			@board = Board.new
-			@turn = human
-			play
-		elsif wish == 'n'
-			exit
-		end
+		(wish == 'y') ? start_new_game : (wish == 'n') ? exit : play_again?
+	end
+
+	def start_new_game
+		@board = Board.new
+		@turn = human
+		play
+	end
+
+	def each_player_takes_turns
+		clear_screen_and_show_grid
+		move
+		switch_turn
 	end
 
 	def play
 		display_welcome_message
 		until end_of_game?
-			clear_screen_and_show_grid
-			move
-			switch_turn
+			each_player_takes_turns
 		end
 		clear_screen_and_show_grid
 		winner_message

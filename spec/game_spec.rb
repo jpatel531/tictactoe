@@ -7,11 +7,11 @@ describe Game do
 	let(:computer) {game.computer}
 	let(:board)  {game.board}
 
-	it 'is initialized with two players' do 
+	it 'the human player goes first' do
+		expect(game.turn).to eq human
 	end
 
-	it 'the human player goes first' do 
-	end
+
 
 	it 'alerts a human winner' do 
 		human.target board, 1, 1
@@ -24,7 +24,6 @@ describe Game do
 		3.times { computer.make_decision_on board}
 		expect(game.winner).to eq computer
 	end
-
 
 
 end

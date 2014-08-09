@@ -5,22 +5,30 @@ module MoveValidator
 	end
 
 	def within_bounds? row, column
-		if row > 3 || column > 3 
-			puts 'Out of range bro' 
-			false
-		else
-			true
-		end
+		(row > 3 || column > 3) ? out_of_range : true
+	end
+
+	def out_of_range
+		puts 'Out of range bro' 
+		false
 	end
 
 	def free_to_place? board, row, column
-		if board.grid[row - 1][column - 1] != ""
-			puts 'Already hit bro'
-			false
-		else
-			true
-		end
+		(board.grid[row - 1][column - 1] != "") ? already_hit : true
 	end
 
+	def already_hit
+		puts 'Already hit bro'
+		false
+	end
+
+	def check input
+		exit if input == "exit"
+		get_input if invalid? input
+	end
+
+	def invalid? string
+		(/^\d, \d$/ =~ string).nil?
+	end
 
 end
