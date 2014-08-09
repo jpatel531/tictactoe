@@ -70,6 +70,8 @@ class Game
 
 	def start_new_game
 		@board = Board.new
+		@computer.board = @board
+		@human.board = @board
 		@turn = human
 		play
 	end
