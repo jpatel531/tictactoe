@@ -8,31 +8,27 @@ class Computer < Player
 		@marker = "O"
 	end
 
-	def make_decision_on board
-		if first_go_on? board
-			initial_move_on board
-		elsif threatening_on? board
-			killer_shot_on board
-		elsif threatened_on? board
-			block_opponent_on board
-		elsif has_one_in_a_line_on? board
-			attack board
-		else
-			throw_wildcard_on board
-			# attack board
-		end
+	def coordinate_values_on board
+		Proc.new {|coordinate| board.grid[coordinate[0]][coordinate[1]]}
 	end
+
+	def blank_cell_on board
+		Proc.new {|coordinate| board.grid[coordinate[0]][coordinate[1]] == ""}
+	end
+
+	def make_decision_on board
+		(first_go_on? board) ? (initial_move_on board) : ((threatening_on? board) ? (killer_shot_on board) : ((threatened_on? board) ? (block_opponent_on board) : ((has_one_in_a_line_on? board) ? (attack board) : (throw_wildcard_on board))))
+	end
+
 
 	def first_go_on? board
 		board.grid.none? {|row| row.include? "O"}
 	end
 
 	def has_one_in_a_line_on? board
-		board.winning_combinations.find do |name, coordinate_set|
-			potential_row = coordinate_set.map {|coordinate| board.grid[coordinate[0]][coordinate[1]]}
-			if (!potential_row.include? 'X') && (potential_row.include? 'O')
-				return true
-			end
+		board.winning_combinations.any? do |name, coordinate_set|
+			potential_row = coordinate_set.map(&coordinate_values_on(board))
+			true if (!potential_row.include? 'X') && (potential_row.include? 'O')
 		end
 		false
 	end
@@ -50,9 +46,9 @@ class Computer < Player
 
 	def attack board
 		board.winning_combinations.find do |name, coordinate_set|
-			potential_row = coordinate_set.map {|coordinate| board.grid[coordinate[0]][coordinate[1]]}
+			potential_row = coordinate_set.map(&coordinate_values_on(board))
 			if (!potential_row.include? 'X') && (potential_row.include? 'O')
-				this_spot = coordinate_set.select {|coordinate| board.grid[coordinate[0]][coordinate[1]] == ""}.shuffle.flatten
+				this_spot = coordinate_set.select(&blank_cell_on(board)).shuffle.flatten
 				target board, this_spot[0] + 1, this_spot[1] + 1
 			end
 		end
@@ -76,15 +72,18 @@ class Computer < Player
 
 	def threats_on? board, neighbouring_mark
 		board.winning_combinations.any? do |name, coordinate_set|
-			coordinate_set.map {|coordinate| board.grid[coordinate[0]][coordinate[1]]}.permutation.to_a.include? [neighbouring_mark, neighbouring_mark, ""]
+			contains_two_in_a_line_and_one_blank coordinate_set, board, neighbouring_mark
 		end
 	end
 
+	def contains_two_in_a_line_and_one_blank coordinate_set, board, neighbouring_mark
+		coordinate_set.map(&coordinate_values_on(board)).permutation.to_a.include? [neighbouring_mark, neighbouring_mark, ""]
+	end
 
 	def fill_remaining_spot_on board, neighbouring_mark
 		board.winning_combinations.each do |name, coordinate_set|
-			if coordinate_set.map {|coordinate| board.grid[coordinate[0]][coordinate[1]]}.permutation.to_a.include? [neighbouring_mark, neighbouring_mark, ""]
-				remaining_coordinate = coordinate_set.find {|coordinate| board.grid[coordinate[0]][coordinate[1]] == ""}.flatten
+			if contains_two_in_a_line_and_one_blank coordinate_set, board, neighbouring_mark
+				remaining_coordinate = coordinate_set.find(&blank_cell_on(board)).flatten
 				target board, (remaining_coordinate[0] + 1), (remaining_coordinate[1] + 1)
 			end
 		end
