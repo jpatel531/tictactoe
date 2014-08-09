@@ -13,6 +13,8 @@ class Game
 		@computer = Computer.new
 		@board = Board.new
 		@turn ||= @human
+		computer.board = @board
+		human.board = @board
 	end
 
 	def display_welcome_message
@@ -24,7 +26,7 @@ class Game
 	end
 		
 	def move
-		(turn == human) ? (get_input) : (computer.make_decision_on board)
+		(turn == human) ? (get_input) : (computer.make_decision)
 	end
 
 	def get_input 
@@ -32,7 +34,7 @@ class Game
 		input = STDIN.gets.chomp
 		check input
 		coordinates = input.split(", ").map(&:to_i)
-		valid_move?(board, coordinates[0], coordinates[1]) ? human.target(board, coordinates[0], coordinates[1]) : get_input
+		valid_move?(coordinates[0], coordinates[1]) ? human.target(coordinates[0], coordinates[1]) : get_input
 	end
 
 	def winner

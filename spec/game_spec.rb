@@ -14,14 +14,14 @@ describe Game do
 
 
 	it 'alerts a human winner' do 
-		human.target board, 1, 1
-		human.target board, 1, 2
-		human.target board, 1, 3
+		human.target 1, 1
+		human.target 1, 2
+		human.target 1, 3
 		expect(game.winner).to eq human
 	end
 
 	it 'alerts a computer winner' do 
-		3.times { computer.make_decision_on board}
+		3.times { computer.make_decision}
 		expect(game.winner).to eq computer
 	end
 

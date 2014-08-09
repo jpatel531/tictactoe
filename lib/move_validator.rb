@@ -1,7 +1,7 @@
 module MoveValidator
 
-	def valid_move? board, row, column
-		within_bounds?(row, column) && free_to_place?(board, row, column)
+	def valid_move? row, column
+		within_bounds?(row, column) && free_to_place?(row, column)
 	end
 
 	def within_bounds? row, column
@@ -13,7 +13,7 @@ module MoveValidator
 		false
 	end
 
-	def free_to_place? board, row, column
+	def free_to_place? row, column
 		(board.grid[row - 1][column - 1] != "") ? already_hit : true
 	end
 
