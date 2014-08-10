@@ -14,7 +14,7 @@ class Game
 		@human = Player.new
 		@computer = Computer.new
 		@board = Board.new
-		@turn ||= @human
+		@turn = @human
 		computer.board = @board
 		human.board = @board
 	end
@@ -69,10 +69,7 @@ class Game
 	end
 
 	def start_new_game
-		@board = Board.new
-		@computer.board = @board
-		@human.board = @board
-		@turn = human
+		initialize
 		play
 	end
 
