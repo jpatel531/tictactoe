@@ -1,10 +1,10 @@
 require_relative 'player'
 require_relative 'board'
-require_relative 'grid_helpers'
+require_relative 'grid_scouters'
 
 class Computer < Player
 
-	include GridHelpers
+	include GridScouters
 
 	attr_accessor :board
 
@@ -22,12 +22,10 @@ class Computer < Player
 	end
 
 	def has_one_in_a_line?
-		board.winning_combinations.any? do |name, coordinate_set|
-			potential_row = coordinate_set.map(&coordinate_values)
-			true if (!potential_row.include? 'X') && (potential_row.include? 'O')
-		end
+		board.winning_combinations.any?(&single_computer_mark(:find))
 		false
 	end
+
 
 	def throw_wildcard
 		potential_row = board.grid.find { |row| row.include? "" }
@@ -41,13 +39,7 @@ class Computer < Player
 	end
 
 	def advance
-		board.winning_combinations.find do |name, coordinate_set|
-			potential_row = coordinate_set.map(&coordinate_values)
-			if (!potential_row.include? 'X') && (potential_row.include? 'O')
-				this_spot = coordinate_set.select(&blank_cell).shuffle.flatten
-				target this_spot[0] + 1, this_spot[1] + 1
-			end
-		end
+		board.winning_combinations.find(&single_computer_mark(:attack))
 	end
 
 	def killer_shot

@@ -1,6 +1,6 @@
 require_relative 'computer'
 require_relative 'rules'
-require_relative 'grid_helpers'
+require_relative 'grid_scouters'
 require_relative 'ui'
 
 class Game
@@ -9,7 +9,7 @@ class Game
 	attr_accessor :turn
 
 	include Rules
-	include GridHelpers
+	include GridScouters
 	include UI
 
 	def initialize
